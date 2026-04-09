@@ -1,0 +1,2908 @@
+ npx shadcn@latest add @react-bits/PillNav-JS-CSS
+import PillNav from './PillNav';
+import logo from '/path/to/logo.svg';
+
+<PillNav
+  logo={logo}
+  logoAlt="Company Logo"
+  items={[
+    { label: 'Home', href: '/' },
+    { label: 'About', href: '/about' },
+    { label: 'Services', href: '/services' },
+    { label: 'Contact', href: '/contact' }
+  ]}
+  activeHref="/"
+  className="custom-nav"
+  ease="power2.easeOut"
+  baseColor="#000000"
+  pillColor="#ffffff"
+  hoveredPillTextColor="#ffffff"
+  pillTextColor="#000000"
+  theme="light"
+  initialLoadAnimation={false}
+/>
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+animated-hero.tsx
+import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { MoveRight, PhoneCall } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+function Hero() {
+  const [titleNumber, setTitleNumber] = useState(0);
+  const titles = useMemo(
+    () => ["amazing", "new", "wonderful", "beautiful", "smart"],
+    []
+  );
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (titleNumber === titles.length - 1) {
+        setTitleNumber(0);
+      } else {
+        setTitleNumber(titleNumber + 1);
+      }
+    }, 2000);
+    return () => clearTimeout(timeoutId);
+  }, [titleNumber, titles]);
+
+  return (
+    <div className="w-full">
+      <div className="container mx-auto">
+        <div className="flex gap-8 py-20 lg:py-40 items-center justify-center flex-col">
+          <div>
+            <Button variant="secondary" size="sm" className="gap-4">
+              Read our launch article <MoveRight className="w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex gap-4 flex-col">
+            <h1 className="text-5xl md:text-7xl max-w-2xl tracking-tighter text-center font-regular">
+              <span className="text-spektr-cyan-50">This is something</span>
+              <span className="relative flex w-full justify-center overflow-hidden text-center md:pb-4 md:pt-1">
+                &nbsp;
+                {titles.map((title, index) => (
+                  <motion.span
+                    key={index}
+                    className="absolute font-semibold"
+                    initial={{ opacity: 0, y: "-100" }}
+                    transition={{ type: "spring", stiffness: 50 }}
+                    animate={
+                      titleNumber === index
+                        ? {
+                            y: 0,
+                            opacity: 1,
+                          }
+                        : {
+                            y: titleNumber > index ? -150 : 150,
+                            opacity: 0,
+                          }
+                    }
+                  >
+                    {title}
+                  </motion.span>
+                ))}
+              </span>
+            </h1>
+
+            <p className="text-lg md:text-xl leading-relaxed tracking-tight text-muted-foreground max-w-2xl text-center">
+              Managing a small business today is already tough. Avoid further
+              complications by ditching outdated, tedious trade methods. Our
+              goal is to streamline SMB trade, making it easier and faster than
+              ever.
+            </p>
+          </div>
+          <div className="flex flex-row gap-3">
+            <Button size="lg" className="gap-4" variant="outline">
+              Jump on a call <PhoneCall className="w-4 h-4" />
+            </Button>
+            <Button size="lg" className="gap-4">
+              Sign up here <MoveRight className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export { Hero };
+
+
+demo.tsx
+import { Hero } from "@/components/ui/animated-hero"
+
+function HeroDemo() {
+  return (
+    <div className="block">
+      <Hero />
+    </div>
+  );
+}
+
+export { HeroDemo };
+```
+
+Copy-paste these files for dependencies:
+```tsx
+shadcn/button
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+Button.displayName = "Button"
+
+export { Button, buttonVariants }
+
+```
+
+Install NPM dependencies:
+```bash
+lucide-react, framer-motion, @radix-ui/react-slot, class-variance-authority
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
+na hero 
+agora depois da hero 
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+container-scroll-animation.tsx
+"use client";
+import React, { useRef } from "react";
+import { useScroll, useTransform, motion, MotionValue } from "framer-motion";
+
+export const ContainerScroll = ({
+  titleComponent,
+  children,
+}: {
+  titleComponent: string | React.ReactNode;
+  children: React.ReactNode;
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+  });
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
+
+  const scaleDimensions = () => {
+    return isMobile ? [0.7, 0.9] : [1.05, 1];
+  };
+
+  const rotate = useTransform(scrollYProgress, [0, 1], [20, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], scaleDimensions());
+  const translate = useTransform(scrollYProgress, [0, 1], [0, -100]);
+
+  return (
+    <div
+      className="h-[60rem] md:h-[80rem] flex items-center justify-center relative p-2 md:p-20"
+      ref={containerRef}
+    >
+      <div
+        className="py-10 md:py-40 w-full relative"
+        style={{
+          perspective: "1000px",
+        }}
+      >
+        <Header translate={translate} titleComponent={titleComponent} />
+        <Card rotate={rotate} translate={translate} scale={scale}>
+          {children}
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export const Header = ({ translate, titleComponent }: any) => {
+  return (
+    <motion.div
+      style={{
+        translateY: translate,
+      }}
+      className="div max-w-5xl mx-auto text-center"
+    >
+      {titleComponent}
+    </motion.div>
+  );
+};
+
+export const Card = ({
+  rotate,
+  scale,
+  children,
+}: {
+  rotate: MotionValue<number>;
+  scale: MotionValue<number>;
+  translate: MotionValue<number>;
+  children: React.ReactNode;
+}) => {
+  return (
+    <motion.div
+      style={{
+        rotateX: rotate,
+        scale,
+        boxShadow:
+          "0 0 #0000004d, 0 9px 20px #0000004a, 0 37px 37px #00000042, 0 84px 50px #00000026, 0 149px 60px #0000000a, 0 233px 65px #00000003",
+      }}
+      className="max-w-5xl -mt-12 mx-auto h-[30rem] md:h-[40rem] w-full border-4 border-[#6C6C6C] p-2 md:p-6 bg-[#222222] rounded-[30px] shadow-2xl"
+    >
+      <div className=" h-full w-full  overflow-hidden rounded-2xl bg-gray-100 dark:bg-zinc-900 md:rounded-2xl md:p-4 ">
+        {children}
+      </div>
+    </motion.div>
+  );
+};
+
+
+demo.tsx
+"use client";
+import React from "react";
+import { ContainerScroll } from "@/components/ui/container-scroll-animation";
+import Image from "next/image";
+
+export function HeroScrollDemo() {
+  return (
+    <div className="flex flex-col overflow-hidden pb-[500px] pt-[1000px]">
+      <ContainerScroll
+        titleComponent={
+          <>
+            <h1 className="text-4xl font-semibold text-black dark:text-white">
+              Unleash the power of <br />
+              <span className="text-4xl md:text-[6rem] font-bold mt-1 leading-none">
+                Scroll Animations
+              </span>
+            </h1>
+          </>
+        }
+      >
+        <Image
+          src={https://ui.aceternity.com/_next/image?url=%2Flinear.webp&w=3840&q=75}
+          alt="hero"
+          height={720}
+          width={1400}
+          className="mx-auto rounded-2xl object-cover h-full object-left-top"
+          draggable={false}
+        />
+      </ContainerScroll>
+    </div>
+  );
+}
+
+```
+
+Install NPM dependencies:
+```bash
+framer-motion
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+interactive-bento-gallery.tsx
+"use client"
+import React, { useEffect, useRef, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { X } from 'lucide-react';
+
+
+// MediaItemType defines the structure of a media item
+interface MediaItemType {
+    id: number;
+    type: string;
+    title: string;
+    desc: string;
+    url: string;
+    span: string;
+}
+// MediaItem component renders either a video or image based on item.type
+const MediaItem = ({ item, className, onClick }: { item: MediaItemType, className?: string, onClick?: () => void }) => {
+    const videoRef = useRef<HTMLVideoElement>(null); // Reference for video element
+    const [isInView, setIsInView] = useState(false); // To track if video is in the viewport
+    const [isBuffering, setIsBuffering] = useState(true);  // To track if video is buffering
+
+    // Intersection Observer to detect if video is in view and play/pause accordingly
+    useEffect(() => {
+        const options = {
+            root: null,
+            rootMargin: '50px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                setIsInView(entry.isIntersecting); // Set isInView to true if the video is in view
+            });
+        }, options);
+
+        if (videoRef.current) {
+            observer.observe(videoRef.current); // Start observing the video element
+        }
+
+        return () => {
+            if (videoRef.current) {
+                observer.unobserve(videoRef.current); // Clean up observer when component unmounts
+            }
+        };
+    }, []);
+    // Handle video play/pause based on whether the video is in view or not
+    useEffect(() => {
+        let mounted = true;
+
+        const handleVideoPlay = async () => {
+            if (!videoRef.current || !isInView || !mounted) return; // Don't play if video is not in view or component is unmounted
+
+            try {
+                if (videoRef.current.readyState >= 3) {
+                    setIsBuffering(false);
+                    await videoRef.current.play(); // Play the video if it's ready
+                } else {
+                    setIsBuffering(true);
+                    await new Promise((resolve) => {
+                        if (videoRef.current) {
+                            videoRef.current.oncanplay = resolve; // Wait until the video can start playing
+                        }
+                    });
+                    if (mounted) {
+                        setIsBuffering(false);
+                        await videoRef.current.play();
+                    }
+                }
+            } catch (error) {
+                console.warn("Video playback failed:", error);
+            }
+        };
+
+        if (isInView) {
+            handleVideoPlay();
+        } else if (videoRef.current) {
+            videoRef.current.pause();
+        }
+
+        return () => {
+            mounted = false;
+            if (videoRef.current) {
+                videoRef.current.pause();
+                videoRef.current.removeAttribute('src');
+                videoRef.current.load();
+            }
+        };
+    }, [isInView]);
+
+    // Render either a video or image based on item.type
+
+    if (item.type === 'video') {
+        return (
+            <div className={${className} relative overflow-hidden}>
+                <video
+                    ref={videoRef}
+                    className="w-full h-full object-cover"
+                    onClick={onClick}
+                    playsInline
+                    muted
+                    loop
+                    preload="auto"
+                    style={{
+                        opacity: isBuffering ? 0.8 : 1,
+                        transition: 'opacity 0.2s',
+                        transform: 'translateZ(0)',
+                        willChange: 'transform',
+                    }}
+                >
+                    <source src={item.url} type="video/mp4" />
+                </video>
+                {isBuffering && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+                        <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    </div>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <img
+            src={item.url} // Image source URL
+            alt={item.title} // Alt text for the image
+            className={${className} object-cover cursor-pointer} // Style the image
+            onClick={onClick} // Trigger onClick when the image is clicked
+            loading="lazy" // Lazy load the image for performance
+            decoding="async" // Decode the image asynchronously
+        />
+    );
+};
+
+
+
+// GalleryModal component displays the selected media item in a modal
+interface GalleryModalProps {
+    selectedItem: MediaItemType;
+    isOpen: boolean;
+    onClose: () => void;
+    setSelectedItem: (item: MediaItemType | null) => void;
+    mediaItems: MediaItemType[]; // List of media items to display in the modal
+}
+const GalleryModal = ({ selectedItem, isOpen, onClose, setSelectedItem, mediaItems }: GalleryModalProps) => {
+    const [dockPosition, setDockPosition] = useState({ x: 0, y: 0 });  // Track the position of the dockable panel
+
+    if (!isOpen) return null; // Return null if the modal is not open
+
+    return (
+        <>
+            {/* Main Modal */}
+            <motion.div
+                initial={{ scale: 0.98 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0.98 }}
+                transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30
+                }}
+                className="fixed inset-0 w-full min-h-screen sm:h-[90vh] md:h-[600px] backdrop-blur-lg 
+                          rounded-none sm:rounded-lg md:rounded-xl overflow-hidden z-10"
+
+            >
+                {/* Main Content */}
+                <div className="h-full flex flex-col">
+                    <div className="flex-1 p-2 sm:p-3 md:p-4 flex items-center justify-center bg-gray-50/50">
+                        <AnimatePresence mode="wait">
+                            <motion.div
+                                key={selectedItem.id}
+                                className="relative w-full aspect-[16/9] max-w-[95%] sm:max-w-[85%] md:max-w-3xl 
+                                         h-auto max-h-[70vh] rounded-lg overflow-hidden shadow-md"
+                                initial={{ y: 20, scale: 0.97 }}
+                                animate={{
+                                    y: 0,
+                                    scale: 1,
+                                    transition: {
+                                        type: "spring",
+                                        stiffness: 500,
+                                        damping: 30,
+                                        mass: 0.5
+                                    }
+                                }}
+                                exit={{
+                                    y: 20,
+                                    scale: 0.97,
+                                    transition: { duration: 0.15 }
+                                }}
+                                onClick={onClose}
+                            >
+                                <MediaItem item={selectedItem} className="w-full h-full object-contain bg-gray-900/20" onClick={onClose} />
+                                <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-3 md:p-4 
+                                              bg-gradient-to-t from-black/50 to-transparent">
+                                    <h3 className="text-white text-base sm:text-lg md:text-xl font-semibold">
+                                        {selectedItem.title}
+                                    </h3>
+                                    <p className="text-white/80 text-xs sm:text-sm mt-1">
+                                        {selectedItem.desc}
+                                    </p>
+                                </div>
+                            </motion.div>
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                {/* Close Button */}
+                <motion.button
+                    className="absolute top-2 sm:top-2.5 md:top-3 right-2 sm:right-2.5 md:right-3 
+                              p-2 rounded-full bg-gray-200/80 text-gray-700 hover:bg-gray-300/80 
+                              text-xs sm:text-sm backdrop-blur-sm "
+                    onClick={onClose}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                >
+                    <X className='w-3 h-3' />
+                </motion.button>
+
+            </motion.div>
+
+            {/* Draggable Dock */}
+            <motion.div
+                drag
+                dragMomentum={false}
+                dragElastic={0.1}
+                initial={false}
+                animate={{ x: dockPosition.x, y: dockPosition.y }}
+                onDragEnd={(_, info) => {
+                    setDockPosition(prev => ({
+                        x: prev.x + info.offset.x,
+                        y: prev.y + info.offset.y
+                    }));
+                }}
+                className="fixed z-50 left-1/2 bottom-4 -translate-x-1/2 touch-none"
+            >
+                <motion.div
+                    className="relative rounded-xl bg-sky-400/20 backdrop-blur-xl 
+                             border border-blue-400/30 shadow-lg
+                             cursor-grab active:cursor-grabbing"
+                >
+                    <div className="flex items-center -space-x-2 px-3 py-2">
+                        {mediaItems.map((item, index) => (
+                            <motion.div
+                                key={item.id}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedItem(item);
+                                }}
+                                style={{
+                                    zIndex: selectedItem.id === item.id ? 30 : mediaItems.length - index,
+                                }}
+                                className={`
+                                    relative group
+                                    w-8 h-8 sm:w-9 sm:h-9 md:w-10 md:h-10 flex-shrink-0 
+                                    rounded-lg overflow-hidden 
+                                    cursor-pointer hover:z-20
+                                    ${selectedItem.id === item.id
+                                        ? 'ring-2 ring-white/70 shadow-lg'
+                                        : 'hover:ring-2 hover:ring-white/30'}
+                                `}
+                                initial={{ rotate: index % 2 === 0 ? -15 : 15 }}
+                                animate={{
+                                    scale: selectedItem.id === item.id ? 1.2 : 1,
+                                    rotate: selectedItem.id === item.id ? 0 : index % 2 === 0 ? -15 : 15,
+                                    y: selectedItem.id === item.id ? -8 : 0,
+                                }}
+                                whileHover={{
+                                    scale: 1.3,
+                                    rotate: 0,
+                                    y: -10,
+                                    transition: { type: "spring", stiffness: 400, damping: 25 }
+                                }}
+                            >
+                                <MediaItem item={item} className="w-full h-full" onClick={() => setSelectedItem(item)} />
+                                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-white/20" />
+                                {selectedItem.id === item.id && (
+                                    <motion.div
+                                        layoutId="activeGlow"
+                                        className="absolute -inset-2 bg-white/20 blur-xl"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        transition={{ duration: 0.2 }}
+                                    />
+                                )}
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+            </motion.div>
+        </>
+    );
+};
+
+
+
+interface InteractiveBentoGalleryProps {
+    mediaItems: MediaItemType[]
+    title: string
+    description: string
+
+}
+
+const InteractiveBentoGallery: React.FC<InteractiveBentoGalleryProps> = ({ mediaItems, title, description }) => {
+    const [selectedItem, setSelectedItem] = useState<MediaItemType | null>(null);
+    const [items, setItems] = useState(mediaItems);
+    const [isDragging, setIsDragging] = useState(false);
+
+    return (
+        <div className="container mx-auto px-4 py-8 max-w-4xl">
+            <div className="mb-8 text-center">
+                <motion.h1
+                    className="text-2xl sm:text-3xl md:text-4xl font-bold bg-clip-text text-transparent 
+                             bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900
+                             dark:from-white dark:via-gray-200 dark:to-white"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5 }}
+                >
+                    {title}
+                </motion.h1>
+                <motion.p
+                    className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
+                >
+                    {description}
+                </motion.p>
+            </div>
+            <AnimatePresence mode="wait">
+                {selectedItem ? (
+                    <GalleryModal
+                        selectedItem={selectedItem}
+                        isOpen={true}
+                        onClose={() => setSelectedItem(null)}
+                        setSelectedItem={setSelectedItem}
+                        mediaItems={items}
+                    />
+                ) : (
+                    <motion.div
+                        className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-3 auto-rows-[60px]"
+                        initial="hidden"
+                        animate="visible"
+                        exit="hidden"
+                        variants={{
+                            hidden: { opacity: 0 },
+                            visible: {
+                                opacity: 1,
+                                transition: { staggerChildren: 0.1 }
+                            }
+                        }}
+                    >
+                        {items.map((item, index) => (
+                            <motion.div
+                                key={item.id}
+                                layoutId={media-${item.id}}
+                                className={relative overflow-hidden rounded-xl cursor-move ${item.span}}
+                                onClick={() => !isDragging && setSelectedItem(item)}
+                                variants={{
+                                    hidden: { y: 50, scale: 0.9, opacity: 0 },
+                                    visible: {
+                                        y: 0,
+                                        scale: 1,
+                                        opacity: 1,
+                                        transition: {
+                                            type: "spring",
+                                            stiffness: 350,
+                                            damping: 25,
+                                            delay: index * 0.05
+                                        }
+                                    }
+                                }}
+                                whileHover={{ scale: 1.02 }}
+                                drag
+                                dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+                                dragElastic={1}
+                                onDragStart={() => setIsDragging(true)}
+                                onDragEnd={(e, info) => {
+                                    setIsDragging(false);
+                                    const moveDistance = info.offset.x + info.offset.y;
+                                    if (Math.abs(moveDistance) > 50) {
+                                        const newItems = [...items];
+                                        const draggedItem = newItems[index];
+                                        const targetIndex = moveDistance > 0 ?
+                                            Math.min(index + 1, items.length - 1) :
+                                            Math.max(index - 1, 0);
+                                        newItems.splice(index, 1);
+                                        newItems.splice(targetIndex, 0, draggedItem);
+                                        setItems(newItems);
+                                    }
+                                }}
+                            >
+                                <MediaItem
+                                    item={item}
+                                    className="absolute inset-0 w-full h-full"
+                                    onClick={() => !isDragging && setSelectedItem(item)}
+                                />
+                                <motion.div
+                                    className="absolute inset-0 flex flex-col justify-end p-2 sm:p-3 md:p-4"
+                                    initial={{ opacity: 0 }}
+                                    whileHover={{ opacity: 1 }}
+                                    transition={{ duration: 0.2 }}
+                                >
+                                    <div className="absolute inset-0 flex flex-col justify-end p-2 sm:p-3 md:p-4">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                                        <h3 className="relative text-white text-xs sm:text-sm md:text-base font-medium line-clamp-1">
+                                            {item.title}
+                                        </h3>
+                                        <p className="relative text-white/70 text-[10px] sm:text-xs md:text-sm mt-0.5 line-clamp-2">
+                                            {item.desc}
+                                        </p>
+                                    </div>
+                                </motion.div>
+                            </motion.div>
+                        ))}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+};
+
+
+export default InteractiveBentoGallery
+
+demo.tsx
+import InteractiveBentoGallery from "@/components/blocks/interactive-bento-gallery"
+
+const mediaItems = [
+  {
+    id: 1,
+    type: "image",
+    title: "Anurag Mishra",
+    desc: "Driven, innovative, visionary",
+    url: "https://kxptt4m9j4.ufs.sh/f/9YHhEDeslzkcbP3rYTiXwH7Y106CepJOsoAgQjyFi3MUfDkh",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2",
+  },
+  {
+    id: 2,
+    type: "video",
+    title: "Dog Puppy",
+    desc: "Adorable loyal companion.",
+    url: "https://cdn.pixabay.com/video/2024/07/24/222837_large.mp4",
+    span: "md:col-span-2 md:row-span-2 col-span-1 sm:col-span-2 sm:row-span-2",
+  },
+  {
+    id: 3,
+    type: "image",
+    title: "Forest Path",
+    desc: "Mystical forest trail",
+    url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-2 sm:row-span-2 ",
+  },
+  {
+    id: 4,
+    type: "image",
+    title: "Falling Leaves",
+    desc: "Autumn scenery",
+    url: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+    span: "md:col-span-2 md:row-span-2 sm:col-span-1 sm:row-span-2 ",
+  },
+  {
+    id: 5,
+    type: "video",
+    title: "Bird Parrot",
+    desc: "Vibrant feathered charm",
+    url: "https://cdn.pixabay.com/video/2020/07/30/46026-447087782_large.mp4",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2 ",
+  },
+  {
+    id: 6,
+    type: "image",
+    title: "Beach Paradise",
+    desc: "Sunny tropical beach",
+    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+    span: "md:col-span-2 md:row-span-2 sm:col-span-1 sm:row-span-2 ",
+  },
+  {
+    id: 7,
+    type: "video",
+    title: "Shiva Temple",
+    desc: "Peaceful Shiva sanctuary.",
+    url: "https://cdn.pixabay.com/video/2020/05/25/40130-424930032_large.mp4",
+    span: "md:col-span-1 md:row-span-3 sm:col-span-1 sm:row-span-2 ",
+  },
+]
+
+export function BentoGridGalleryDemo() {
+  return (
+    <div className="min-h-screen overflow-y-auto">
+      <InteractiveBentoGallery
+        mediaItems={mediaItems}
+        title="Gallery Shots Collection"
+        description="Drag and explore our curated collection of shots"
+      />
+    </div>
+  )
+}
+
+```
+
+Install NPM dependencies:
+```bash
+lucide-react, framer-motion
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+scroll-expansion-hero.tsx
+'use client';
+
+import {
+  useEffect,
+  useRef,
+  useState,
+  ReactNode,
+  TouchEvent,
+  WheelEvent,
+} from 'react';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+
+interface ScrollExpandMediaProps {
+  mediaType?: 'video' | 'image';
+  mediaSrc: string;
+  posterSrc?: string;
+  bgImageSrc: string;
+  title?: string;
+  date?: string;
+  scrollToExpand?: string;
+  textBlend?: boolean;
+  children?: ReactNode;
+}
+
+const ScrollExpandMedia = ({
+  mediaType = 'video',
+  mediaSrc,
+  posterSrc,
+  bgImageSrc,
+  title,
+  date,
+  scrollToExpand,
+  textBlend,
+  children,
+}: ScrollExpandMediaProps) => {
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
+  const [showContent, setShowContent] = useState<boolean>(false);
+  const [mediaFullyExpanded, setMediaFullyExpanded] = useState<boolean>(false);
+  const [touchStartY, setTouchStartY] = useState<number>(0);
+  const [isMobileState, setIsMobileState] = useState<boolean>(false);
+
+  const sectionRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setScrollProgress(0);
+    setShowContent(false);
+    setMediaFullyExpanded(false);
+  }, [mediaType]);
+
+  useEffect(() => {
+    const handleWheel = (e: WheelEvent) => {
+      if (mediaFullyExpanded && e.deltaY < 0 && window.scrollY <= 5) {
+        setMediaFullyExpanded(false);
+        e.preventDefault();
+      } else if (!mediaFullyExpanded) {
+        e.preventDefault();
+        const scrollDelta = e.deltaY * 0.0009;
+        const newProgress = Math.min(
+          Math.max(scrollProgress + scrollDelta, 0),
+          1
+        );
+        setScrollProgress(newProgress);
+
+        if (newProgress >= 1) {
+          setMediaFullyExpanded(true);
+          setShowContent(true);
+        } else if (newProgress < 0.75) {
+          setShowContent(false);
+        }
+      }
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      setTouchStartY(e.touches[0].clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!touchStartY) return;
+
+      const touchY = e.touches[0].clientY;
+      const deltaY = touchStartY - touchY;
+
+      if (mediaFullyExpanded && deltaY < -20 && window.scrollY <= 5) {
+        setMediaFullyExpanded(false);
+        e.preventDefault();
+      } else if (!mediaFullyExpanded) {
+        e.preventDefault();
+        // Increase sensitivity for mobile, especially when scrolling back
+        const scrollFactor = deltaY < 0 ? 0.008 : 0.005; // Higher sensitivity for scrolling back
+        const scrollDelta = deltaY * scrollFactor;
+        const newProgress = Math.min(
+          Math.max(scrollProgress + scrollDelta, 0),
+          1
+        );
+        setScrollProgress(newProgress);
+
+        if (newProgress >= 1) {
+          setMediaFullyExpanded(true);
+          setShowContent(true);
+        } else if (newProgress < 0.75) {
+          setShowContent(false);
+        }
+
+        setTouchStartY(touchY);
+      }
+    };
+
+    const handleTouchEnd = (): void => {
+      setTouchStartY(0);
+    };
+
+    const handleScroll = (): void => {
+      if (!mediaFullyExpanded) {
+        window.scrollTo(0, 0);
+      }
+    };
+
+    window.addEventListener('wheel', handleWheel as unknown as EventListener, {
+      passive: false,
+    });
+    window.addEventListener('scroll', handleScroll as EventListener);
+    window.addEventListener(
+      'touchstart',
+      handleTouchStart as unknown as EventListener,
+      { passive: false }
+    );
+    window.addEventListener(
+      'touchmove',
+      handleTouchMove as unknown as EventListener,
+      { passive: false }
+    );
+    window.addEventListener('touchend', handleTouchEnd as EventListener);
+
+    return () => {
+      window.removeEventListener(
+        'wheel',
+        handleWheel as unknown as EventListener
+      );
+      window.removeEventListener('scroll', handleScroll as EventListener);
+      window.removeEventListener(
+        'touchstart',
+        handleTouchStart as unknown as EventListener
+      );
+      window.removeEventListener(
+        'touchmove',
+        handleTouchMove as unknown as EventListener
+      );
+      window.removeEventListener('touchend', handleTouchEnd as EventListener);
+    };
+  }, [scrollProgress, mediaFullyExpanded, touchStartY]);
+
+  useEffect(() => {
+    const checkIfMobile = (): void => {
+      setIsMobileState(window.innerWidth < 768);
+    };
+
+    checkIfMobile();
+    window.addEventListener('resize', checkIfMobile);
+
+    return () => window.removeEventListener('resize', checkIfMobile);
+  }, []);
+
+  const mediaWidth = 300 + scrollProgress * (isMobileState ? 650 : 1250);
+  const mediaHeight = 400 + scrollProgress * (isMobileState ? 200 : 400);
+  const textTranslateX = scrollProgress * (isMobileState ? 180 : 150);
+
+  const firstWord = title ? title.split(' ')[0] : '';
+  const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
+
+  return (
+    <div
+      ref={sectionRef}
+      className='transition-colors duration-700 ease-in-out overflow-x-hidden'
+    >
+      <section className='relative flex flex-col items-center justify-start min-h-[100dvh]'>
+        <div className='relative w-full flex flex-col items-center min-h-[100dvh]'>
+          <motion.div
+            className='absolute inset-0 z-0 h-full'
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 - scrollProgress }}
+            transition={{ duration: 0.1 }}
+          >
+            <Image
+              src={bgImageSrc}
+              alt='Background'
+              width={1920}
+              height={1080}
+              className='w-screen h-screen'
+              style={{
+                objectFit: 'cover',
+                objectPosition: 'center',
+              }}
+              priority
+            />
+            <div className='absolute inset-0 bg-black/10' />
+          </motion.div>
+
+          <div className='container mx-auto flex flex-col items-center justify-start relative z-10'>
+            <div className='flex flex-col items-center justify-center w-full h-[100dvh] relative'>
+              <div
+                className='absolute z-0 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 transition-none rounded-2xl'
+                style={{
+                  width: ${mediaWidth}px,
+                  height: ${mediaHeight}px,
+                  maxWidth: '95vw',
+                  maxHeight: '85vh',
+                  boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.3)',
+                }}
+              >
+                {mediaType === 'video' ? (
+                  mediaSrc.includes('youtube.com') ? (
+                    <div className='relative w-full h-full pointer-events-none'>
+                      <iframe
+                        width='100%'
+                        height='100%'
+                        src={
+                          mediaSrc.includes('embed')
+                            ? mediaSrc +
+                              (mediaSrc.includes('?') ? '&' : '?') +
+                              'autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&disablekb=1&modestbranding=1'
+                            : mediaSrc.replace('watch?v=', 'embed/') +
+                              '?autoplay=1&mute=1&loop=1&controls=0&showinfo=0&rel=0&disablekb=1&modestbranding=1&playlist=' +
+                              mediaSrc.split('v=')[1]
+                        }
+                        className='w-full h-full rounded-xl'
+                        frameBorder='0'
+                        allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                        allowFullScreen
+                      />
+                      <div
+                        className='absolute inset-0 z-10'
+                        style={{ pointerEvents: 'none' }}
+                      ></div>
+
+                      <motion.div
+                        className='absolute inset-0 bg-black/30 rounded-xl'
+                        initial={{ opacity: 0.7 }}
+                        animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </div>
+                  ) : (
+                    <div className='relative w-full h-full pointer-events-none'>
+                      <video
+                        src={mediaSrc}
+                        poster={posterSrc}
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload='auto'
+                        className='w-full h-full object-cover rounded-xl'
+                        controls={false}
+                        disablePictureInPicture
+                        disableRemotePlayback
+                      />
+                      <div
+                        className='absolute inset-0 z-10'
+                        style={{ pointerEvents: 'none' }}
+                      ></div>
+
+                      <motion.div
+                        className='absolute inset-0 bg-black/30 rounded-xl'
+                        initial={{ opacity: 0.7 }}
+                        animate={{ opacity: 0.5 - scrollProgress * 0.3 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </div>
+                  )
+                ) : (
+                  <div className='relative w-full h-full'>
+                    <Image
+                      src={mediaSrc}
+                      alt={title || 'Media content'}
+                      width={1280}
+                      height={720}
+                      className='w-full h-full object-cover rounded-xl'
+                    />
+
+                    <motion.div
+                      className='absolute inset-0 bg-black/50 rounded-xl'
+                      initial={{ opacity: 0.7 }}
+                      animate={{ opacity: 0.7 - scrollProgress * 0.3 }}
+                      transition={{ duration: 0.2 }}
+                    />
+                  </div>
+                )}
+
+                <div className='flex flex-col items-center text-center relative z-10 mt-4 transition-none'>
+                  {date && (
+                    <p
+                      className='text-2xl text-blue-200'
+                      style={{ transform: translateX(-${textTranslateX}vw) }}
+                    >
+                      {date}
+                    </p>
+                  )}
+                  {scrollToExpand && (
+                    <p
+                      className='text-blue-200 font-medium text-center'
+                      style={{ transform: translateX(${textTranslateX}vw) }}
+                    >
+                      {scrollToExpand}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div
+                className={`flex items-center justify-center text-center gap-4 w-full relative z-10 transition-none flex-col ${
+                  textBlend ? 'mix-blend-difference' : 'mix-blend-normal'
+                }`}
+              >
+                <motion.h2
+                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-blue-200 transition-none'
+                  style={{ transform: translateX(-${textTranslateX}vw) }}
+                >
+                  {firstWord}
+                </motion.h2>
+                <motion.h2
+                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-center text-blue-200 transition-none'
+                  style={{ transform: translateX(${textTranslateX}vw) }}
+                >
+                  {restOfTitle}
+                </motion.h2>
+              </div>
+            </div>
+
+            <motion.section
+              className='flex flex-col w-full px-8 py-10 md:px-16 lg:py-20'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: showContent ? 1 : 0 }}
+              transition={{ duration: 0.7 }}
+            >
+              {children}
+            </motion.section>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default ScrollExpandMedia;
+
+
+demo.tsx
+'use client';
+
+import { useState, useEffect } from 'react';
+import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero';
+
+interface MediaAbout {
+  overview: string;
+  conclusion: string;
+}
+
+interface MediaContent {
+  src: string;
+  poster?: string;
+  background: string;
+  title: string;
+  date: string;
+  scrollToExpand: string;
+  about: MediaAbout;
+}
+
+interface MediaContentCollection {
+  [key: string]: MediaContent;
+}
+
+const sampleMediaContent: MediaContentCollection = {
+  video: {
+    src: 'https://me7aitdbxq.ufs.sh/f/2wsMIGDMQRdYuZ5R8ahEEZ4aQK56LizRdfBSqeDMsmUIrJN1',
+    poster:
+      'https://images.pexels.com/videos/5752729/space-earth-universe-cosmos-5752729.jpeg',
+    background:
+      'https://me7aitdbxq.ufs.sh/f/2wsMIGDMQRdYMNjMlBUYHaeYpxduXPVNwf8mnFA61L7rkcoS',
+    title: 'Immersive Video Experience',
+    date: 'Cosmic Journey',
+    scrollToExpand: 'Scroll to Expand Demo',
+    about: {
+      overview:
+        'This is a demonstration of the ScrollExpandMedia component with a video. As you scroll, the video expands to fill more of the screen, creating an immersive experience. This component is perfect for showcasing video content in a modern, interactive way.',
+      conclusion:
+        'The ScrollExpandMedia component provides a unique way to engage users with your content through interactive scrolling. Try switching between video and image modes to see different implementations.',
+    },
+  },
+  image: {
+    src: 'https://images.unsplash.com/photo-1682687982501-1e58ab814714?q=80&w=1280&auto=format&fit=crop',
+    background:
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920&auto=format&fit=crop',
+    title: 'Dynamic Image Showcase',
+    date: 'Underwater Adventure',
+    scrollToExpand: 'Scroll to Expand Demo',
+    about: {
+      overview:
+        'This is a demonstration of the ScrollExpandMedia component with an image. The same smooth expansion effect works beautifully with static images, allowing you to create engaging visual experiences without video content.',
+      conclusion:
+        'The ScrollExpandMedia component works equally well with images and videos. This flexibility allows you to choose the media type that best suits your content while maintaining the same engaging user experience.',
+    },
+  },
+};
+
+const MediaContent = ({ mediaType }: { mediaType: 'video' | 'image' }) => {
+  const currentMedia = sampleMediaContent[mediaType];
+
+  return (
+    <div className='max-w-4xl mx-auto'>
+      <h2 className='text-3xl font-bold mb-6 text-black dark:text-white'>
+        About This Component
+      </h2>
+      <p className='text-lg mb-8 text-black dark:text-white'>
+        {currentMedia.about.overview}
+      </p>
+
+      <p className='text-lg mb-8 text-black dark:text-white'>
+        {currentMedia.about.conclusion}
+      </p>
+    </div>
+  );
+};
+
+export const VideoExpansionTextBlend = () => {
+  const mediaType = 'video';
+  const currentMedia = sampleMediaContent[mediaType];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const resetEvent = new Event('resetSection');
+    window.dispatchEvent(resetEvent);
+  }, []);
+
+  return (
+    <div className='min-h-screen'>
+      <ScrollExpandMedia
+        mediaType={mediaType}
+        mediaSrc={currentMedia.src}
+        posterSrc={currentMedia.poster}
+        bgImageSrc={currentMedia.background}
+        title={currentMedia.title}
+        date={currentMedia.date}
+        scrollToExpand={currentMedia.scrollToExpand}
+        textBlend
+      >
+        <MediaContent mediaType={mediaType} />
+      </ScrollExpandMedia>
+    </div>
+  );
+};
+
+export const ImageExpansionTextBlend = () => {
+  const mediaType = 'image';
+  const currentMedia = sampleMediaContent[mediaType];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const resetEvent = new Event('resetSection');
+    window.dispatchEvent(resetEvent);
+  }, []);
+
+  return (
+    <div className='min-h-screen'>
+      <ScrollExpandMedia
+        mediaType={mediaType}
+        mediaSrc={currentMedia.src}
+        bgImageSrc={currentMedia.background}
+        title={currentMedia.title}
+        date={currentMedia.date}
+        scrollToExpand={currentMedia.scrollToExpand}
+        textBlend
+      >
+        <MediaContent mediaType={mediaType} />
+      </ScrollExpandMedia>
+    </div>
+  );
+};
+
+export const VideoExpansion = () => {
+  const mediaType = 'video';
+  const currentMedia = sampleMediaContent[mediaType];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const resetEvent = new Event('resetSection');
+    window.dispatchEvent(resetEvent);
+  }, []);
+
+  return (
+    <div className='min-h-screen'>
+      <ScrollExpandMedia
+        mediaType={mediaType}
+        mediaSrc={currentMedia.src}
+        posterSrc={currentMedia.poster}
+        bgImageSrc={currentMedia.background}
+        title={currentMedia.title}
+        date={currentMedia.date}
+        scrollToExpand={currentMedia.scrollToExpand}
+      >
+        <MediaContent mediaType={mediaType} />
+      </ScrollExpandMedia>
+    </div>
+  );
+};
+
+export const ImageExpansion = () => {
+  const mediaType = 'image';
+  const currentMedia = sampleMediaContent[mediaType];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const resetEvent = new Event('resetSection');
+    window.dispatchEvent(resetEvent);
+  }, []);
+
+  return (
+    <div className='min-h-screen'>
+      <ScrollExpandMedia
+        mediaType={mediaType}
+        mediaSrc={currentMedia.src}
+        bgImageSrc={currentMedia.background}
+        title={currentMedia.title}
+        date={currentMedia.date}
+        scrollToExpand={currentMedia.scrollToExpand}
+      >
+        <MediaContent mediaType={mediaType} />
+      </ScrollExpandMedia>
+    </div>
+  );
+};
+
+const Demo = () => {
+  const [mediaType, setMediaType] = useState('video');
+  const currentMedia = sampleMediaContent[mediaType];
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+
+    const resetEvent = new Event('resetSection');
+    window.dispatchEvent(resetEvent);
+  }, [mediaType]);
+
+  return (
+    <div className='min-h-screen'>
+      <div className='fixed top-4 right-4 z-50 flex gap-2'>
+        <button
+          onClick={() => setMediaType('video')}
+          className={`px-4 py-2 rounded-lg ${
+            mediaType === 'video'
+              ? 'bg-white text-black'
+              : 'bg-black/50 text-white border border-white/30'
+          }`}
+        >
+          Video
+        </button>
+
+        <button
+          onClick={() => setMediaType('image')}
+          className={`px-4 py-2 rounded-lg ${
+            mediaType === 'image'
+              ? 'bg-white text-black'
+              : 'bg-black/50 text-white border border-white/30'
+          }`}
+        >
+          Image
+        </button>
+      </div>
+
+      <ScrollExpandMedia
+        mediaType={mediaType as 'video' | 'image'}
+        mediaSrc={currentMedia.src}
+        posterSrc={mediaType === 'video' ? currentMedia.poster : undefined}
+        bgImageSrc={currentMedia.background}
+        title={currentMedia.title}
+        date={currentMedia.date}
+        scrollToExpand={currentMedia.scrollToExpand}
+      >
+        <MediaContent mediaType={mediaType as 'video' | 'image'} />
+      </ScrollExpandMedia>
+    </div>
+  );
+};
+
+export default Demo;
+
+```
+
+Install NPM dependencies:
+```bash
+framer-motion
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+testimonial.tsx
+import * as React from "react"
+import { motion, PanInfo } from "framer-motion"
+import { cn } from "@/lib/utils"
+
+interface Testimonial {
+  id: number | string
+  name: string
+  avatar: string
+  description: string
+}
+
+interface TestimonialCarouselProps
+  extends React.HTMLAttributes<HTMLDivElement> {
+  testimonials: Testimonial[]
+  showArrows?: boolean
+  showDots?: boolean
+}
+
+const TestimonialCarousel = React.forwardRef<
+  HTMLDivElement,
+  TestimonialCarouselProps
+>(
+  (
+    { className, testimonials, showArrows = true, showDots = true, ...props },
+    ref,
+  ) => {
+    const [currentIndex, setCurrentIndex] = React.useState(0)
+    const [exitX, setExitX] = React.useState<number>(0)
+
+    const handleDragEnd = (
+      event: MouseEvent | TouchEvent | PointerEvent,
+      info: PanInfo,
+    ) => {
+      if (Math.abs(info.offset.x) > 100) {
+        setExitX(info.offset.x)
+        setTimeout(() => {
+          setCurrentIndex((prev) => (prev + 1) % testimonials.length)
+          setExitX(0)
+        }, 200)
+      }
+    }
+
+    return (
+      <div
+        ref={ref}
+        className={cn(
+          "h-72 w-full flex items-center justify-center",
+          className
+        )}
+        {...props}
+      >
+        <div className="relative w-80 h-64">
+          {testimonials.map((testimonial, index) => {
+            const isCurrentCard = index === currentIndex
+            const isPrevCard =
+              index === (currentIndex + 1) % testimonials.length
+            const isNextCard =
+              index === (currentIndex + 2) % testimonials.length
+
+            if (!isCurrentCard && !isPrevCard && !isNextCard) return null
+
+            return (
+              <motion.div
+                key={testimonial.id}
+                className={cn(
+                  "absolute w-full h-full rounded-2xl cursor-grab active:cursor-grabbing",
+                  "bg-white shadow-xl",
+                  "dark:bg-card dark:shadow-[2px_2px_4px_rgba(0,0,0,0.4),-1px_-1px_3px_rgba(255,255,255,0.1)]",
+                )}
+                style={{
+                  zIndex: isCurrentCard ? 3 : isPrevCard ? 2 : 1,
+                }}
+                drag={isCurrentCard ? "x" : false}
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.7}
+                onDragEnd={isCurrentCard ? handleDragEnd : undefined}
+                initial={{
+                  scale: 0.95,
+                  opacity: 0,
+                  y: isCurrentCard ? 0 : isPrevCard ? 8 : 16,
+                  rotate: isCurrentCard ? 0 : isPrevCard ? -2 : -4,
+                }}
+                animate={{
+                  scale: isCurrentCard ? 1 : 0.95,
+                  opacity: isCurrentCard ? 1 : isPrevCard ? 0.6 : 0.3,
+                  x: isCurrentCard ? exitX : 0,
+                  y: isCurrentCard ? 0 : isPrevCard ? 8 : 16,
+                  rotate: isCurrentCard ? exitX / 20 : isPrevCard ? -2 : -4,
+                }}
+                transition={{
+                  type: "spring",
+                  stiffness: 300,
+                  damping: 20,
+                }}
+              >
+                {showArrows && isCurrentCard && (
+                  <div className="absolute inset-x-0 top-2 flex justify-between px-4">
+                    <span className="text-2xl select-none cursor-pointer text-gray-300 hover:text-gray-400 dark:text-muted-foreground dark:hover:text-primary">
+                      &larr;
+                    </span>
+                    <span className="text-2xl select-none cursor-pointer text-gray-300 hover:text-gray-400 dark:text-muted-foreground dark:hover:text-primary">
+                      &rarr;
+                    </span>
+                  </div>
+                )}
+
+                <div className="p-6 flex flex-col items-center gap-4">
+                  <img
+                    src={testimonial.avatar}
+                    alt={testimonial.name}
+                    className="w-16 h-16 rounded-full object-cover"
+                  />
+                  <h3 className="text-lg font-semibold text-gray-800 dark:text-foreground">
+                    {testimonial.name}
+                  </h3>
+                  <p className="text-center text-sm text-gray-600 dark:text-muted-foreground">
+                    {testimonial.description}
+                  </p>
+                </div>
+              </motion.div>
+            )
+          })}
+          {showDots && (
+            <div className="absolute -bottom-8 left-0 right-0 flex justify-center gap-2">
+              {testimonials.map((_, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    "w-2 h-2 rounded-full transition-colors",
+                    index === currentIndex
+                      ? "bg-blue-500 dark:bg-primary"
+                      : "bg-gray-300 dark:bg-muted-foreground/30",
+                  )}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  },
+)
+TestimonialCarousel.displayName = "TestimonialCarousel"
+
+export { TestimonialCarousel, type Testimonial }
+
+
+demo.tsx
+import { TestimonialCarousel } from "@/components/ui/testimonial"
+
+const TESTIMONIAL_DATA = [
+  {
+    id: 1,
+    name: "John Doe",
+    avatar: "https://randomuser.me/api/portraits/men/1.jpg",
+    description: "Amazing experience working with this team! The results exceeded my expectations."
+  },
+  {
+    id: 2,
+    name: "Jane Smith",
+    avatar: "https://randomuser.me/api/portraits/women/1.jpg",
+    description: "Highly recommended! Great service and professional approach."
+  },
+  {
+    id: 3,
+    name: "Mike Johnson",
+    avatar: "https://randomuser.me/api/portraits/men/2.jpg",
+    description: "Exceptional quality and professionalism. Would definitely work with them again."
+  }
+]
+
+export function TestimonialCarouselDemo() {
+  return (
+    <TestimonialCarousel 
+      testimonials={TESTIMONIAL_DATA}
+      className="max-w-2xl mx-auto"
+    />
+  )
+}
+```
+
+Install NPM dependencies:
+```bash
+framer-motion
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+blur-fade.tsx
+"use client"
+
+import { useRef } from "react"
+import {
+  AnimatePresence,
+  motion,
+  useInView,
+  UseInViewOptions,
+  Variants,
+} from "framer-motion"
+
+type MarginType = UseInViewOptions["margin"]
+
+interface BlurFadeProps {
+  children: React.ReactNode
+  className?: string
+  variant?: {
+    hidden: { y: number }
+    visible: { y: number }
+  }
+  duration?: number
+  delay?: number
+  yOffset?: number
+  inView?: boolean
+  inViewMargin?: MarginType
+  blur?: string
+}
+
+export function BlurFade({
+  children,
+  className,
+  variant,
+  duration = 0.4,
+  delay = 0,
+  yOffset = 6,
+  inView = false,
+  inViewMargin = "-50px",
+  blur = "6px",
+}: BlurFadeProps) {
+  const ref = useRef(null)
+  const inViewResult = useInView(ref, { once: true, margin: inViewMargin })
+  const isInView = !inView || inViewResult
+  const defaultVariants: Variants = {
+    hidden: { y: yOffset, opacity: 0, filter: blur(${blur}) },
+    visible: { y: -yOffset, opacity: 1, filter: blur(0px) },
+  }
+  const combinedVariants = variant || defaultVariants
+  return (
+    <AnimatePresence>
+      <motion.div
+        ref={ref}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+        exit="hidden"
+        variants={combinedVariants}
+        transition={{
+          delay: 0.04 + delay,
+          duration,
+          ease: "easeOut",
+        }}
+        className={className}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  )
+}
+
+
+demo.tsx
+import { BlurFade } from "@/components/ui/blur-fade"
+
+export function BlurFadeTextDemo() {
+  return (
+    <section id="header">
+      <BlurFade delay={0.25} inView>
+        <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+          Hello World 👋
+        </h2>
+      </BlurFade>
+      <BlurFade delay={0.25 * 2} inView>
+        <span className="text-xl text-pretty tracking-tighter sm:text-3xl xl:text-4xl/none">
+          Nice to meet you
+        </span>
+      </BlurFade>
+    </section>
+  )
+}
+
+```
+
+Install NPM dependencies:
+```bash
+framer-motion
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+card-curtain-reveal.tsx
+"use client"
+
+import * as React from "react"
+import { HTMLMotionProps, Variants, motion } from "motion/react"
+
+import { cn } from "@/lib/utils"
+
+const curtainVriants: Variants = {
+  visible: {
+    clipPath: "polygon(0 0,100% 0,100% 100%,0 100%)",
+    transition: {
+      duration: 0.4,
+      ease: ["easeOut", [0.25, 1.5, 0.5, 1]],
+    },
+  },
+
+  hidden: {
+    clipPath: "polygon(50% 0,50% 0,50% 100%,50% 100%)",
+    transition: {
+      duration: 0.3,
+      ease: ["easeOut", [0.25, 1.5, 0.5, 1]],
+    },
+  },
+}
+
+interface CardCurtainRevealContextValue {
+  isMouseIn: boolean
+}
+const CardCurtainRevealContext = React.createContext<
+  CardCurtainRevealContextValue | undefined
+>(undefined)
+function useCardCurtainRevealContext() {
+  const context = React.useContext(CardCurtainRevealContext)
+  if (!context) {
+    throw new Error(
+      "useCardCurtainRevealContext must be used within a CardCurtainReveal Component"
+    )
+  }
+  return context
+}
+
+const CardCurtainReveal = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ children, className, ...props }, ref) => {
+  const [isMouseIn, setIsMouseIn] = React.useState(false)
+  const handleMouseEnter = React.useCallback(() => setIsMouseIn(true), [])
+  const handleMouseLeave = React.useCallback(() => setIsMouseIn(false), [])
+
+  return (
+    <CardCurtainRevealContext.Provider value={{ isMouseIn }}>
+      <div
+        ref={ref}
+        className={cn(
+          "relative flex flex-col gap-2 overflow-hidden",
+          className
+        )}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        {...props}
+      >
+        {children}
+      </div>
+    </CardCurtainRevealContext.Provider>
+  )
+})
+CardCurtainReveal.displayName = "CardCurtainReveal"
+
+const CardCurtainRevealFooter = React.forwardRef<
+  HTMLDivElement,
+  HTMLMotionProps<"div">
+>(({ className, ...props }, ref) => {
+  const { isMouseIn } = useCardCurtainRevealContext()
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      variants={curtainVriants}
+      animate={isMouseIn ? "visible" : "hidden"}
+      {...props}
+    />
+  )
+})
+CardCurtainRevealFooter.displayName = "CardCurtainReveal"
+
+const CardCurtainRevealBody = React.forwardRef<
+  HTMLDivElement,
+  React.HtmlHTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  return <div ref={ref} className={cn("flex-1 p-6", className)} {...props} />
+})
+CardCurtainRevealBody.displayName = "CardCurtainRevealBody"
+
+const CardCurtainRevealTitle = React.forwardRef<
+  HTMLHeadingElement,
+  HTMLMotionProps<"h2">
+>(({ className, ...props }, ref) => {
+  const { isMouseIn } = useCardCurtainRevealContext()
+
+  return (
+    <motion.h2
+      ref={ref}
+      className={className}
+      animate={isMouseIn ? { y: 0 } : { y: 170 }}
+      transition={{ duration: 0.3, ease: "easeOut" }}
+      {...props}
+    />
+  )
+})
+CardCurtainRevealTitle.displayName = "CardCurtainRevealTitle"
+
+const CardCurtain = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
+  ({ className, ...props }, ref) => {
+    const { isMouseIn } = useCardCurtainRevealContext()
+
+    return (
+      <motion.div
+        ref={ref}
+        className={cn(
+          "pointer-events-none absolute inset-0 size-full mix-blend-difference",
+          className
+        )}
+        variants={curtainVriants}
+        animate={isMouseIn ? "visible" : "hidden"}
+        {...props}
+      />
+    )
+  }
+)
+CardCurtain.displayName = "CardCurtain"
+
+const CardCurtainRevealDescription = React.forwardRef<
+  HTMLDivElement,
+  HTMLMotionProps<"div">
+>(({ className, ...props }, ref) => {
+  const { isMouseIn } = useCardCurtainRevealContext()
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      variants={curtainVriants}
+      animate={isMouseIn ? "visible" : "hidden"}
+      {...props}
+    />
+  )
+})
+CardCurtainRevealDescription.displayName = "CardCurtainRevealDescription"
+
+export {
+  CardCurtainReveal,
+  CardCurtainRevealBody,
+  CardCurtainRevealFooter,
+  CardCurtainRevealDescription,
+  CardCurtainRevealTitle,
+  CardCurtain,
+}
+
+
+demo.tsx
+import { 
+  CardCurtainReveal,
+  CardCurtainRevealBody,
+  CardCurtainRevealDescription,
+  CardCurtainRevealFooter,
+  CardCurtainRevealTitle,
+  CardCurtain } from "@/components/ui/card-curtain-reveal"
+
+import { ArrowUpRight } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+
+export const CardCurtainRevealDemo = () => {
+  return (
+    <div className="min-h-screen place-content-center place-items-center">
+      <CardCurtainReveal className="h-[560px] w-96 border border-zinc-100 bg-zinc-950 text-zinc-50 shadow">
+        <CardCurtainRevealBody className="">
+          <CardCurtainRevealTitle className="text-3xl font-medium tracking-tight">
+            Behind <br />
+            the Curtain
+          </CardCurtainRevealTitle>
+          <CardCurtainRevealDescription className="my-4 ">
+            <p>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit.
+              Accusantium voluptate, eum quia temporibus fugiat rerum nobis modi
+              dolor, delectus laboriosam, quae adipisci reprehenderit officiis
+              quidem iure ducimus incidunt officia. Magni, eligendi repellendus.
+              Fugiat, natus aut?
+            </p>
+          </CardCurtainRevealDescription>
+          <Button
+            variant={"secondary"}
+            size={"icon"}
+            className="aspect-square rounded-full"
+          >
+            <ArrowUpRight />
+          </Button>
+
+          <CardCurtain className=" bg-zinc-50" />
+        </CardCurtainRevealBody>
+
+        <CardCurtainRevealFooter className="mt-auto">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            width="100%"
+            height="100%"
+            alt="Tokyo street"
+            className=""
+            src="https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?q=80&w=2388&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          />
+        </CardCurtainRevealFooter>
+      </CardCurtainReveal>
+    </div>
+  )
+}
+
+
+```
+
+Copy-paste these files for dependencies:
+```tsx
+shadcn/button
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+Button.displayName = "Button"
+
+export { Button, buttonVariants }
+
+```
+
+Install NPM dependencies:
+```bash
+motion, @radix-ui/react-slot, class-variance-authority
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
+
+
+You are given a task to integrate an existing React component in the codebase
+
+The codebase should support:
+- shadcn project structure  
+- Tailwind CSS
+- Typescript
+
+If it doesn't, provide instructions on how to setup project via shadcn CLI, install Tailwind or Typescript.
+
+Determine the default path for components and styles. 
+If default path for components is not /components/ui, provide instructions on why it's important to create this folder
+Copy-paste this component to /components/ui folder:
+```tsx
+gallery6.tsx
+"use client";
+
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Carousel,
+  CarouselApi,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+
+interface GalleryItem {
+  id: string;
+  title: string;
+  summary: string;
+  url: string;
+  image: string;
+}
+
+interface Gallery6Props {
+  heading?: string;
+  demoUrl?: string;
+  items?: GalleryItem[];
+}
+
+const Gallery6 = ({
+  heading = "Gallery",
+  demoUrl = "https://www.shadcnblocks.com",
+  items = [
+    {
+      id: "item-1",
+      title: "Build Modern UIs",
+      summary:
+        "Create stunning user interfaces with our comprehensive design system.",
+      url: "#",
+      image: "/images/block/placeholder-dark-1.svg",
+    },
+    {
+      id: "item-2",
+      title: "Computer Vision Technology",
+      summary:
+        "Powerful image recognition and processing capabilities that allow AI systems to analyze, understand, and interpret visual information from the world.",
+      url: "#",
+      image: "/images/block/placeholder-dark-1.svg",
+    },
+    {
+      id: "item-3",
+      title: "Machine Learning Automation",
+      summary:
+        "Self-improving algorithms that learn from data patterns to automate complex tasks and make intelligent decisions with minimal human intervention.",
+      url: "#",
+      image: "/images/block/placeholder-dark-1.svg",
+    },
+    {
+      id: "item-4",
+      title: "Predictive Analytics",
+      summary:
+        "Advanced forecasting capabilities that analyze historical data to predict future trends and outcomes, helping businesses make data-driven decisions.",
+      url: "#",
+      image: "/images/block/placeholder-dark-1.svg",
+    },
+    {
+      id: "item-5",
+      title: "Neural Network Architecture",
+      summary:
+        "Sophisticated AI models inspired by human brain structure, capable of solving complex problems through deep learning and pattern recognition.",
+      url: "#",
+      image: "/images/block/placeholder-dark-1.svg",
+    },
+  ],
+}: Gallery6Props) => {
+  const [carouselApi, setCarouselApi] = useState<CarouselApi>();
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
+  useEffect(() => {
+    if (!carouselApi) {
+      return;
+    }
+    const updateSelection = () => {
+      setCanScrollPrev(carouselApi.canScrollPrev());
+      setCanScrollNext(carouselApi.canScrollNext());
+    };
+    updateSelection();
+    carouselApi.on("select", updateSelection);
+    return () => {
+      carouselApi.off("select", updateSelection);
+    };
+  }, [carouselApi]);
+  return (
+    <section className="py-32">
+      <div className="container">
+        <div className="mb-8 flex flex-col justify-between md:mb-14 md:flex-row md:items-end lg:mb-16">
+          <div>
+            <h2 className="mb-3 text-3xl font-semibold md:mb-4 md:text-4xl lg:mb-6">
+              {heading}
+            </h2>
+            <a
+              href={demoUrl}
+              className="group flex items-center gap-1 text-sm font-medium md:text-base lg:text-lg"
+            >
+              Book a demo
+              <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-1" />
+            </a>
+          </div>
+          <div className="mt-8 flex shrink-0 items-center justify-start gap-2">
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                carouselApi?.scrollPrev();
+              }}
+              disabled={!canScrollPrev}
+              className="disabled:pointer-events-auto"
+            >
+              <ArrowLeft className="size-5" />
+            </Button>
+            <Button
+              size="icon"
+              variant="outline"
+              onClick={() => {
+                carouselApi?.scrollNext();
+              }}
+              disabled={!canScrollNext}
+              className="disabled:pointer-events-auto"
+            >
+              <ArrowRight className="size-5" />
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className="w-full">
+        <Carousel
+          setApi={setCarouselApi}
+          opts={{
+            breakpoints: {
+              "(max-width: 768px)": {
+                dragFree: true,
+              },
+            },
+          }}
+          className="relative left-[-1rem]"
+        >
+          <CarouselContent className="-mr-4 ml-8 2xl:ml-[max(8rem,calc(50vw-700px+1rem))] 2xl:mr-[max(0rem,calc(50vw-700px-1rem))]">
+            {items.map((item) => (
+              <CarouselItem key={item.id} className="pl-4 md:max-w-[452px]">
+                <a
+                  href={item.url}
+                  className="group flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="flex aspect-[3/2] overflow-clip rounded-xl">
+                      <div className="flex-1">
+                        <div className="relative h-full w-full origin-bottom transition duration-300 group-hover:scale-105">
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="h-full w-full object-cover object-center"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mb-2 line-clamp-3 break-words pt-4 text-lg font-medium md:mb-3 md:pt-4 md:text-xl lg:pt-4 lg:text-2xl">
+                    {item.title}
+                  </div>
+                  <div className="mb-8 line-clamp-2 text-sm text-muted-foreground md:mb-12 md:text-base lg:mb-9">
+                    {item.summary}
+                  </div>
+                  <div className="flex items-center text-sm">
+                    Read more{" "}
+                    <ArrowRight className="ml-2 size-5 transition-transform group-hover:translate-x-1" />
+                  </div>
+                </a>
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+        </Carousel>
+      </div>
+    </section>
+  );
+};
+
+export { Gallery6 };
+
+
+demo.tsx
+import { Gallery6 } from "@/components/blocks/gallery6"
+
+const demoData = {
+  heading: "Featured Projects",
+  demoUrl: "https://www.shadcnblocks.com",
+  items: [
+    {
+      id: "item-1",
+      title: "Build Modern UIs",
+      summary:
+        "Create stunning user interfaces with our comprehensive design system.",
+      url: "#",
+      image: "https://www.shadcnblocks.com/images/block/placeholder-dark-1.svg",
+    },
+    {
+      id: "item-2",
+      title: "Design System Components",
+      summary:
+        "Explore our library of customizable components built with shadcn/ui and Tailwind CSS.",
+      url: "#",
+      image: "https://www.shadcnblocks.com/images/block/placeholder-dark-1.svg",
+    },
+    {
+      id: "item-3",
+      title: "Responsive Layouts",
+      summary:
+        "Build websites that look great on any device with our responsive design patterns.",
+      url: "#",
+      image: "https://www.shadcnblocks.com/images/block/placeholder-dark-1.svg",
+    },
+    {
+      id: "item-4",
+      title: "Developer Experience",
+      summary:
+        "Streamline your workflow with our developer-friendly tools and documentation.",
+      url: "#",
+      image: "https://www.shadcnblocks.com/images/block/placeholder-dark-1.svg",
+    },
+    {
+      id: "item-5",
+      title: "Performance First",
+      summary:
+        "Create fast, optimized websites using our performance-focused components.",
+      url: "#",
+      image: "https://www.shadcnblocks.com/images/block/placeholder-dark-1.svg",
+    },
+  ],
+};
+
+function Gallery6Demo() {
+  return <Gallery6 {...demoData} />;
+}
+
+export { Gallery6Demo };
+
+```
+
+Copy-paste these files for dependencies:
+```tsx
+shadcn/button
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const buttonVariants = cva(
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  },
+)
+
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
+    VariantProps<typeof buttonVariants> {
+  asChild?: boolean
+}
+
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  },
+)
+Button.displayName = "Button"
+
+export { Button, buttonVariants }
+
+```
+```tsx
+shadcn/carousel
+"use client"
+
+import * as React from "react"
+import useEmblaCarousel, {
+  type UseEmblaCarouselType,
+} from "embla-carousel-react"
+import { ArrowLeft, ArrowRight } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+
+type CarouselApi = UseEmblaCarouselType[1]
+type UseCarouselParameters = Parameters<typeof useEmblaCarousel>
+type CarouselOptions = UseCarouselParameters[0]
+type CarouselPlugin = UseCarouselParameters[1]
+
+type CarouselProps = {
+  opts?: CarouselOptions
+  plugins?: CarouselPlugin
+  orientation?: "horizontal" | "vertical"
+  setApi?: (api: CarouselApi) => void
+}
+
+type CarouselContextProps = {
+  carouselRef: ReturnType<typeof useEmblaCarousel>[0]
+  api: ReturnType<typeof useEmblaCarousel>[1]
+  scrollPrev: () => void
+  scrollNext: () => void
+  canScrollPrev: boolean
+  canScrollNext: boolean
+} & CarouselProps
+
+const CarouselContext = React.createContext<CarouselContextProps | null>(null)
+
+function useCarousel() {
+  const context = React.useContext(CarouselContext)
+
+  if (!context) {
+    throw new Error("useCarousel must be used within a <Carousel />")
+  }
+
+  return context
+}
+
+const Carousel = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & CarouselProps
+>(
+  (
+    {
+      orientation = "horizontal",
+      opts,
+      setApi,
+      plugins,
+      className,
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const [carouselRef, api] = useEmblaCarousel(
+      {
+        ...opts,
+        axis: orientation === "horizontal" ? "x" : "y",
+      },
+      plugins,
+    )
+    const [canScrollPrev, setCanScrollPrev] = React.useState(false)
+    const [canScrollNext, setCanScrollNext] = React.useState(false)
+
+    const onSelect = React.useCallback((api: CarouselApi) => {
+      if (!api) {
+        return
+      }
+
+      setCanScrollPrev(api.canScrollPrev())
+      setCanScrollNext(api.canScrollNext())
+    }, [])
+
+    const scrollPrev = React.useCallback(() => {
+      api?.scrollPrev()
+    }, [api])
+
+    const scrollNext = React.useCallback(() => {
+      api?.scrollNext()
+    }, [api])
+
+    const handleKeyDown = React.useCallback(
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (event.key === "ArrowLeft") {
+          event.preventDefault()
+          scrollPrev()
+        } else if (event.key === "ArrowRight") {
+          event.preventDefault()
+          scrollNext()
+        }
+      },
+      [scrollPrev, scrollNext],
+    )
+
+    React.useEffect(() => {
+      if (!api || !setApi) {
+        return
+      }
+
+      setApi(api)
+    }, [api, setApi])
+
+    React.useEffect(() => {
+      if (!api) {
+        return
+      }
+
+      onSelect(api)
+      api.on("reInit", onSelect)
+      api.on("select", onSelect)
+
+      return () => {
+        api?.off("select", onSelect)
+      }
+    }, [api, onSelect])
+
+    return (
+      <CarouselContext.Provider
+        value={{
+          carouselRef,
+          api: api,
+          opts,
+          orientation:
+            orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
+          scrollPrev,
+          scrollNext,
+          canScrollPrev,
+          canScrollNext,
+        }}
+      >
+        <div
+          ref={ref}
+          onKeyDownCapture={handleKeyDown}
+          className={cn("relative", className)}
+          role="region"
+          aria-roledescription="carousel"
+          {...props}
+        >
+          {children}
+        </div>
+      </CarouselContext.Provider>
+    )
+  },
+)
+Carousel.displayName = "Carousel"
+
+const CarouselContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  const { carouselRef, orientation } = useCarousel()
+
+  return (
+    <div ref={carouselRef} className="overflow-hidden">
+      <div
+        ref={ref}
+        className={cn(
+          "flex",
+          orientation === "horizontal" ? "-ml-4" : "-mt-4 flex-col",
+          className,
+        )}
+        {...props}
+      />
+    </div>
+  )
+})
+CarouselContent.displayName = "CarouselContent"
+
+const CarouselItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  const { orientation } = useCarousel()
+
+  return (
+    <div
+      ref={ref}
+      role="group"
+      aria-roledescription="slide"
+      className={cn(
+        "min-w-0 shrink-0 grow-0 basis-full",
+        orientation === "horizontal" ? "pl-4" : "pt-4",
+        className,
+      )}
+      {...props}
+    />
+  )
+})
+CarouselItem.displayName = "CarouselItem"
+
+const CarouselPrevious = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<typeof Button>
+>(({ className, variant = "outline", size = "icon", ...props }, ref) => {
+  const { orientation, scrollPrev, canScrollPrev } = useCarousel()
+
+  return (
+    <Button
+      ref={ref}
+      variant={variant}
+      size={size}
+      className={cn(
+        "absolute  h-8 w-8 rounded-full",
+        orientation === "horizontal"
+          ? "-left-12 top-1/2 -translate-y-1/2"
+          : "-top-12 left-1/2 -translate-x-1/2 rotate-90",
+        className,
+      )}
+      disabled={!canScrollPrev}
+      onClick={scrollPrev}
+      {...props}
+    >
+      <ArrowLeft className="h-4 w-4" />
+      <span className="sr-only">Previous slide</span>
+    </Button>
+  )
+})
+CarouselPrevious.displayName = "CarouselPrevious"
+
+const CarouselNext = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentProps<typeof Button>
+>(({ className, variant = "outline", size = "icon", ...props }, ref) => {
+  const { orientation, scrollNext, canScrollNext } = useCarousel()
+
+  return (
+    <Button
+      ref={ref}
+      variant={variant}
+      size={size}
+      className={cn(
+        "absolute h-8 w-8 rounded-full",
+        orientation === "horizontal"
+          ? "-right-12 top-1/2 -translate-y-1/2"
+          : "-bottom-12 left-1/2 -translate-x-1/2 rotate-90",
+        className,
+      )}
+      disabled={!canScrollNext}
+      onClick={scrollNext}
+      {...props}
+    >
+      <ArrowRight className="h-4 w-4" />
+      <span className="sr-only">Next slide</span>
+    </Button>
+  )
+})
+CarouselNext.displayName = "CarouselNext"
+
+export {
+  type CarouselApi,
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+}
+
+```
+```tsx
+shadcn/card
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+const Card = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      className,
+    )}
+    {...props}
+  />
+))
+Card.displayName = "Card"
+
+const CardHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex flex-col space-y-1.5 p-6", className)}
+    {...props}
+  />
+))
+CardHeader.displayName = "CardHeader"
+
+const CardTitle = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn(
+      "text-2xl font-semibold leading-none tracking-tight",
+      className,
+    )}
+    {...props}
+  />
+))
+CardTitle.displayName = "CardTitle"
+
+const CardDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+CardDescription.displayName = "CardDescription"
+
+const CardContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("p-6 pt-0", className)} {...props} />
+))
+CardContent.displayName = "CardContent"
+
+const CardFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("flex items-center p-6 pt-0", className)}
+    {...props}
+  />
+))
+CardFooter.displayName = "CardFooter"
+
+export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+
+```
+
+Install NPM dependencies:
+```bash
+lucide-react, @radix-ui/react-slot, class-variance-authority, embla-carousel-react
+```
+
+Implementation Guidelines
+ 1. Analyze the component structure and identify all required dependencies
+ 2. Review the component's argumens and state
+ 3. Identify any required context providers or hooks and install them
+ 4. Questions to Ask
+ - What data/props will be passed to this component?
+ - Are there any specific state management requirements?
+ - Are there any required assets (images, icons, etc.)?
+ - What is the expected responsive behavior?
+ - What is the best place to use this component in the app?
+
+Steps to integrate
+ 0. Copy paste all the code above in the correct directories
+ 1. Install external dependencies
+ 2. Fill image assets with Unsplash stock images you know exist
+ 3. Use lucide-react icons for svgs or logos if component requires them
