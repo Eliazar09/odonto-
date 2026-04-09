@@ -85,6 +85,14 @@ export default function InteractiveBentoGallery() {
   const [selected, setSelected] = useState(null)
   const [items, setItems] = useState(baseItems.map(i => ({ ...i, url: '' })))
   const [dragging, setDragging] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640)
+    check()
+    window.addEventListener('resize', check)
+    return () => window.removeEventListener('resize', check)
+  }, [])
 
   useEffect(() => {
     baseItems.forEach(async (item) => {
@@ -110,8 +118,8 @@ export default function InteractiveBentoGallery() {
           }}>
             Transformações que <span className="text-gradient-gold">falam por si</span>
           </h2>
-          <p style={{ fontFamily: 'var(--font)', fontSize: '1rem', color: 'var(--gray-600)', maxWidth: 440, margin: '0 auto' }}>
-            Clique em qualquer foto para ver em destaque. Arraste para reordenar.
+            <p style={{ fontFamily: 'var(--font)', fontSize: '1rem', color: 'var(--gray-600)', maxWidth: 440, margin: '0 auto' }}>
+            {isMobile ? 'Deslize para ver os resultados. Toque para ampliar.' : 'Clique em qualquer foto para ver em destaque. Arraste para reordenar.'}
           </p>
         </BlurFade>
 
@@ -127,6 +135,41 @@ export default function InteractiveBentoGallery() {
           ) : null}
         </AnimatePresence>
 
+        {/* Mobile: horizontal scroll strip */}
+        {isMobile ? (
+          <div style={{
+            display: 'flex', gap: 12, overflowX: 'auto', paddingBottom: 12,
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch',
+            msOverflowStyle: 'none', scrollbarWidth: 'none',
+          }}>
+            {items.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => setSelected(item)}
+                style={{
+                  flex: '0 0 72vw', maxWidth: 260, height: 220,
+                  borderRadius: 16, overflow: 'hidden', position: 'relative',
+                  scrollSnapAlign: 'start', cursor: 'pointer',
+                  background: '#e5e7eb', flexShrink: 0,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+                }}
+              >
+                {item.url
+                  ? <img src={item.url} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" />
+                  : <div style={{ width: '100%', height: '100%', background: 'linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
+                }
+                <div style={{
+                  position: 'absolute', bottom: 0, left: 0, right: 0,
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
+                  padding: '10px 12px',
+                }}>
+                  <p style={{ fontFamily: 'var(--font)', fontWeight: 600, fontSize: '0.82rem', color: 'white', margin: 0 }}>{item.title}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4"
           style={{ gap: 12, gridAutoRows: '60px' }}
@@ -198,14 +241,8 @@ export default function InteractiveBentoGallery() {
             </motion.div>
           ))}
         </motion.div>
+        )}
       </div>
-
-      <style>{`
-        @media (max-width: 639px) {
-          #resultados .grid { grid-auto-rows: 140px !important; }
-          #resultados .grid > div { row-span: 1 !important; }
-        }
-      `}</style>
     </section>
   )
 }

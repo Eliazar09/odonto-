@@ -229,6 +229,22 @@ body {
 /* ── Global mobile overrides ── */
 @media (max-width: 767px) {
 
+  /* PillNav: full-width, logo left, hamburger right */
+  #pillnav-header {
+    justify-content: stretch !important;
+    padding: 10px 12px !important;
+  }
+  #pillnav-pill {
+    width: 100% !important;
+    border-radius: 16px !important;
+    justify-content: space-between !important;
+  }
+
+  /* Differentials: force 1 column */
+  .differentials-grid {
+    grid-template-columns: 1fr !important;
+  }
+
   /* Section padding reduction on all known IDs */
   #sobre, #servicos, #resultados, #equipe, #agenda, #contato, #depoimentos, #diferenciais, #faq {
     padding-top: 64px !important;

@@ -24,7 +24,7 @@ export default function PillNav() {
   }, [])
 
   return (
-    <header style={{
+    <header id="pillnav-header" style={{
       position: 'fixed', top: 0, left: 0, right: 0, zIndex: 900,
       display: 'flex', justifyContent: 'center',
       padding: scrolled ? '12px 24px' : '20px 24px',
@@ -33,6 +33,7 @@ export default function PillNav() {
     }}>
       {/* Desktop pill */}
       <motion.div
+        id="pillnav-pill"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
