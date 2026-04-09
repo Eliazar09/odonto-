@@ -1,14 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Heart, Shield, Users, Award } from 'lucide-react'
+import { Heart } from 'lucide-react'
 import { BlurFade } from './ui/BlurFade'
 import { searchPexels } from '../lib/pexels'
-
-const values = [
-  { icon: Heart, label: 'Atendimento Humanizado', desc: 'Cada paciente é único. Cuidamos com empatia e atenção real.' },
-  { icon: Shield, label: 'Ambiente Acolhedor', desc: 'Espaço moderno, seguro e pensado para o seu conforto.' },
-  { icon: Users, label: 'Empresa Inclusiva', desc: 'LGBTQ+ friendly. Aqui todos são bem-vindos sem exceção.' },
-  { icon: Award, label: 'Liderada por Mulheres', desc: 'Gestão feminina com excelência, cuidado e propósito.' },
-]
 
 export default function About() {
   const leftRef = useRef(null)
@@ -100,40 +93,6 @@ export default function About() {
               Boa Vista. Acreditamos que saúde bucal é saúde plena — e que todo paciente merece
               atenção, acolhimento e resultados de verdade.
             </p>
-
-            {/* Values grid */}
-            <div style={{
-              display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20,
-            }}>
-              {values.map((v, i) => (
-                <div key={i} style={{
-                  display: 'flex', gap: 14, alignItems: 'flex-start',
-                  padding: '18px', borderRadius: 16,
-                  background: 'var(--gray-50)', border: '1px solid var(--gray-200)',
-                  transition: 'transform 0.25s, box-shadow 0.25s',
-                  cursor: 'default',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = 'var(--shadow-md)'; }}
-                onMouseLeave={e => { e.currentTarget.style.transform = 'none'; e.currentTarget.style.boxShadow = 'none'; }}
-                >
-                  <div style={{
-                    width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-                    background: 'rgba(249,115,22,0.08)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    <v.icon size={18} color="var(--gold)" />
-                  </div>
-                  <div>
-                    <div style={{ fontFamily: 'var(--font)', fontWeight: 600, fontSize: '0.88rem', color: 'var(--gray-800)', marginBottom: 4 }}>
-                      {v.label}
-                    </div>
-                    <div style={{ fontFamily: 'var(--font)', fontSize: '0.8rem', color: 'var(--gray-600)', lineHeight: 1.5 }}>
-                      {v.desc}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
       </div>
